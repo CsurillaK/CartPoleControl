@@ -1,4 +1,4 @@
-classdef CartPoleReward < handle
+classdef Reward < handle
     properties
         Parameter = struct( ...
             "Stable", struct(...
@@ -27,7 +27,7 @@ classdef CartPoleReward < handle
     end
 
     methods
-        function this = CartPoleReward(environment)
+        function this = Reward(environment)
             this.Environment_ = environment;
         end
         

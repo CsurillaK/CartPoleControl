@@ -1,7 +1,7 @@
 addpath(".\Misc");
 
 %%
-environment = CartPoleEnvironment();
+environment = CartPole.Environment();
 
 load("Agents/Stable/agent_3.mat");
 load("Agents/Unstable/agent_3.mat");

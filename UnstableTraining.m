@@ -1,14 +1,13 @@
-environment = CartPoleEnvironment();
+environment = CartPole.Environment();
 environment.Mode = 2; % Unstable
 
 %% Build agent
 unstableAgent = BuildCartPoleAgent(environment, [350, 200], [250, 200]);
 
 %% Train
-environment.TrajectoryCollection.Parameter.Unstable.StableStartingPositionProbability = 0.7;
-environment.TrajectoryCollection.Parameter.Unstable.StandstillProbability = 0.1;
-
-environment.TrajectoryCollection.Parameter.Unstable.UnstableStartingAngleDistributionWidth = pi;
+environment.Trajectory.Parameter.Unstable.StableStartingPositionProbability = 0.7;
+environment.Trajectory.Parameter.Unstable.StandstillProbability = 0.1;
+environment.Trajectory.Parameter.Unstable.UnstableStartingAngleDistributionWidth = pi;
 
 environment.Reward.Parameter.Unstable.PenaltyOutOfBoundary = 0;
 environment.Reward.Parameter.Unstable.RewardWithinBoundary = 50;

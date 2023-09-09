@@ -1,4 +1,4 @@
-classdef CartPoleEnvironment < rl.env.MATLABEnvironment
+classdef Environment < rl.env.MATLABEnvironment
     properties
         % Stable: 1
         % Unstable: 2
@@ -16,7 +16,7 @@ classdef CartPoleEnvironment < rl.env.MATLABEnvironment
         
         Workspace = [-10, -2, 10, 2] % [lowerLeftCornerXY, upperRightCornerXY]
 
-        TrajectoryCollection = []
+        Trajectory = []
         Reward = []
     end
     
@@ -27,7 +27,7 @@ classdef CartPoleEnvironment < rl.env.MATLABEnvironment
     end
 
     properties (Access = protected)
-        State_ = zeros(CartPoleEnvironment.StateDimension, 1) % [x0, x0d, phi1, phi1d]'
+        State_ = zeros(CartPole.Environment.StateDimension, 1) % [x0, x0d, phi1, phi1d]'
         Action_ = 0
         Trajectory_ = []
 
@@ -49,12 +49,12 @@ classdef CartPoleEnvironment < rl.env.MATLABEnvironment
     end
 
     methods
-        function this = CartPoleEnvironment()
-            ObservationInfo = rlNumericSpec([CartPoleEnvironment.ObservationDimension 1]);
+        function this = Environment()
+            ObservationInfo = rlNumericSpec([CartPole.Environment.ObservationDimension 1]);
             ObservationInfo.Name = 'CartPoleEnvironment observation';
             ObservationInfo.Description = 'x1_ref - x1, x1d_ref - x1d, y1, y1d';
             
-            ActionInfo = rlNumericSpec([CartPoleEnvironment.ActionDimension, 1]);
+            ActionInfo = rlNumericSpec([CartPole.Environment.ActionDimension, 1]);
             ActionInfo.Name = 'CartPoleEnvironment action';
             ActionInfo.Description = 'F';
 
@@ -63,8 +63,8 @@ classdef CartPoleEnvironment < rl.env.MATLABEnvironment
             this.ActionInfo.LowerLimit = - this.Physics.Fmax;
             this.ActionInfo.UpperLimit = + this.Physics.Fmax;
 
-            this.TrajectoryCollection = CartPoleTrajectoryCollection(this);
-            this.Reward = CartPoleReward(this);
+            this.Trajectory = CartPole.Trajectory(this);
+            this.Reward = CartPole.Reward(this);
         end
 
         function jointPosition = GetJointPosition(this)
@@ -279,10 +279,10 @@ classdef CartPoleEnvironment < rl.env.MATLABEnvironment
         function initialObservation = reset(this)
             switch this.Mode
                 case 1
-                    [initialState, this.Trajectory_] = this.TrajectoryCollection.GenerateStable();
+                    [initialState, this.Trajectory_] = this.Trajectory.GenerateStable();
                     this.Reward.Function = @(action, state, trajectory, observation) this.Reward.CalculateStable(action, state, trajectory, observation);
                 case 2
-                    [initialState, this.Trajectory_] = this.TrajectoryCollection.GenerateUnstable();
+                    [initialState, this.Trajectory_] = this.Trajectory.GenerateUnstable();
                     this.Reward.Function = @(action, state, trajectory, observation) this.Reward.CalculateUnstable(action, state, trajectory, observation);
                     this.HasAlreadyEnteredUnstableRegion = false; % needed for episode termination check
                 otherwise

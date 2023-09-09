@@ -1,4 +1,4 @@
-classdef CartPoleTrajectoryCollection < handle
+classdef Trajectory < handle
     properties
         Parameter = struct( ...
             "Stable", struct(...
@@ -28,7 +28,7 @@ classdef CartPoleTrajectoryCollection < handle
     end
     
     methods
-        function this = CartPoleTrajectoryCollection(environment)
+        function this = Trajectory(environment)
             this.Environment_ = environment;
         end
 
@@ -188,10 +188,10 @@ classdef CartPoleTrajectoryCollection < handle
     end
 end
 
-% environment = CartPoleEnvironment();
+% environment = CartPole.Environment();
 % 
 % %%
-% [initialObservation, trajectory] = environment.TrajectoryCollection.GenerateStable();
+% [initialObservation, trajectory] = environment.Trajectory.GenerateStable();
 % 
 % Ts = environment.Physics.Ts;
 % plot(0:Ts:(length(trajectory) - 1) * Ts, trajectory(1,:));

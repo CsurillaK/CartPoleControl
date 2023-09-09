@@ -1,12 +1,12 @@
-environment = CartPoleEnvironment();
+environment = CartPole.Environment();
 environment.Mode = 1; % Stable
 
 %% Initialize agent
 stableAgent = BuildCartPoleAgent(environment, [300, 200], [200, 100]); % [200, 100], [100, 50]
 
 %% Train
-environment.TrajectoryCollection.Parameter.Stable.UnstableStartingPositionProbability = 0.1; % 0.1
-environment.TrajectoryCollection.Parameter.Stable.StandstillProbability = 0.1; % 0.2
+environment.Trajectory.Parameter.Stable.UnstableStartingPositionProbability = 0.1; % 0.1
+environment.Trajectory.Parameter.Stable.StandstillProbability = 0.1; % 0.2
 
 environment.Reward.Parameter.Stable.PenaltyOutOfBoundary = 0;
 environment.Reward.Parameter.Stable.RewardWithinBoundary = 10;
@@ -17,12 +17,12 @@ environment.Reward.Parameter.Stable.Gainx1d = 0.2; % 0.2
 environment.Reward.Parameter.Stable.GainF = 0.1;
 
 stableAgent.AgentOptions.CriticOptimizerOptions.LearnRate = 1e-4; %1e-5;
-stableAgent.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-4; %1e-4;
+stableAgent.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-5; %1e-4;
 
 stableAgent.AgentOptions.MiniBatchSize = 256;
 stableAgent.AgentOptions.NoiseOptions.Variance = 0.4;
 stableAgent.AgentOptions.NoiseOptions.VarianceDecayRate = 0.02;
-stableAgent.AgentOptions.DiscountFactor = 0.99; % 0.98
+stableAgent.AgentOptions.DiscountFactor = 0.995; % 0.98
 
 maxEpisodes = 200;
 trainOptions = rlTrainingOptions( ...
