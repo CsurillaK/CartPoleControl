@@ -22,7 +22,7 @@ stableAgent.AgentOptions.ActorOptimizerOptions.LearnRate = 1e-5; %1e-4;
 stableAgent.AgentOptions.MiniBatchSize = 256;
 stableAgent.AgentOptions.NoiseOptions.Variance = 0.4;
 stableAgent.AgentOptions.NoiseOptions.VarianceDecayRate = 0.02;
-stableAgent.AgentOptions.DiscountFactor = 0.995; % 0.98
+stableAgent.AgentOptions.DiscountFactor = 0.99; % 0.98
 
 maxEpisodes = 200;
 trainOptions = rlTrainingOptions( ...
