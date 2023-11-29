@@ -103,4 +103,11 @@ classdef Reward < handle
             end
         end
     end
+
+    methods(Static)
+        function [reward, isDone] = DummyReward(varargin)
+            reward = 0;
+            isDone = 0;
+        end
+    end
 end

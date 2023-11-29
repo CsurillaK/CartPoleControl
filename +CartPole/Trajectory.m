@@ -81,7 +81,7 @@ classdef Trajectory < handle
                         0; ... phi1d
                         ];
                 otherwise % Follow smooth trajectory starting from stable position
-                    trajectory = this.GenerateSmoothTransition_( ...
+                    trajectory = this.GenerateSmoothTransition( ...
                         this.Parameter.Stable.TimeLimits, ...
                         this.Parameter.Stable.VelocityLimits);
                     
@@ -131,7 +131,7 @@ classdef Trajectory < handle
                         0; ... x1d_ref
                         ];
                 otherwise % Follow smooth trajectory starting from unstable position
-                    trajectory = this.GenerateSmoothTransition_( ...
+                    trajectory = this.GenerateSmoothTransition( ...
                         this.Parameter.Unstable.TimeLimits, ...
                         this.Parameter.Unstable.VelocityLimits);
                     startingDistance = trajectory(1, 1);
@@ -147,10 +147,8 @@ classdef Trajectory < handle
                 0; ... phi1d
                 ];
         end
-    end
 
-    methods (Access = protected)
-        function trajectory = GenerateSmoothTransition_(this, timeLimits, velocityLimits)
+        function trajectory = GenerateSmoothTransition(this, timeLimits, velocityLimits)
             workspaceWidth = this.Environment_.Workspace(3) - this.Environment_.Workspace(1);
 
             distanceLimits = [ ...
@@ -167,13 +165,13 @@ classdef Trajectory < handle
             duration = timeLimits(1) + diff(timeLimits) * randomNumbers(1);
             distance = distanceLimits(1) + diff(distanceLimits) * randomNumbers(2);
             
-            % Limit starting distance to the middle 80% of horizontal workspace
-            startingDistance = this.Environment_.Workspace(1) + 0.1 * workspaceWidth + ...
+            % Limit starting position to the middle 80% of horizontal workspace
+            startingPosition = this.Environment_.Workspace(1) + 0.1 * workspaceWidth + ...
                 (workspaceWidth * 0.8 - distance) * randomNumbers(3); 
             
             % Flip starting and ending positions wwith 50% probability
             positionSwitch = randomNumbers(4) > 0.5;
-            startingDistance = startingDistance + distance * positionSwitch;
+            startingPosition = startingPosition + distance * positionSwitch;
             if positionSwitch
                 distance = -distance;
             end
@@ -181,8 +179,19 @@ classdef Trajectory < handle
             transitionSampleCount = floor(duration / this.Environment_.Physics.Ts) + 1;
             transitionTimeSamples = linspace(0, 1, transitionSampleCount);
             trajectory = zeros(2, transitionSampleCount);
-            trajectory(1,:) = startingDistance + distance * ...
+            trajectory(1,:) = startingPosition + distance * ...
                 ppval(this.TransitionCurve, transitionTimeSamples); % x1_ref
+            trajectory(2,:) = [0 (-trajectory(1,1:end-2)+trajectory(1,3:end))/2/this.Environment_.Physics.Ts 0]; % x1d_ref
+
+            trajectory = this.GenerateTrajectory(startingPosition, distance, duration);
+        end
+
+        function trajectory = GenerateTrajectory(this, startingPosition, distance, duration)
+            % Scale and sample Akima spline
+            transitionSampleCount = floor(duration / this.Environment_.Physics.Ts) + 1;
+            transitionTimeSamples = linspace(0, 1, transitionSampleCount);
+            trajectory = zeros(2, transitionSampleCount);
+            trajectory(1,:) = startingPosition + distance * ppval(this.TransitionCurve, transitionTimeSamples); % x1_ref
             trajectory(2,:) = [0 (-trajectory(1,1:end-2)+trajectory(1,3:end))/2/this.Environment_.Physics.Ts 0]; % x1d_ref
         end
     end

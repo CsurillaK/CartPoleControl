@@ -24,9 +24,12 @@ classdef Environment < rl.env.MATLABEnvironment
         ObservationDimension = 6
         StateDimension = 4
         ActionDimension = 1
+
+        ModeStable = 1
+        ModeUnstable = 2
     end
 
-    properties (Access = protected)
+    properties(Access = protected)
         State_ = zeros(CartPole.Environment.StateDimension, 1) % [x0, x0d, phi1, phi1d]'
         Action_ = 0
         Trajectory_ = []
@@ -42,6 +45,10 @@ classdef Environment < rl.env.MATLABEnvironment
         PositionReferenceBuffer_ = []
         Agent_ = []
         AgentIndex_ = 0
+    end
+
+    properties(Dependent, GetAccess = public)
+        State
     end
 
     properties (Access = public)
@@ -126,7 +133,7 @@ classdef Environment < rl.env.MATLABEnvironment
             
             this.SimulationTime_ = 0;
             this.State_ = zeros(4, 1);
-            this.State_(3) = -0.1;
+            this.State_(3) = pi;
             this.Action_ = 0;
             this.Draw();
             
@@ -276,13 +283,24 @@ classdef Environment < rl.env.MATLABEnvironment
                 );
         end
         
-        function initialObservation = reset(this)
+        function initialObservation = reset(this, varargin)
+            if nargin <= 1 % Reinforcement learning mode
+                switch this.Mode
+                    case this.ModeStable
+                        [initialState, this.Trajectory_] = this.Trajectory.GenerateStable();
+                    case this.ModeUnstable
+                        [initialState, this.Trajectory_] = this.Trajectory.GenerateUnstable();
+                   otherwise
+                        error("Mode %d not supported.", this.Mode);
+                end
+            else % Bypass mode
+                [initialState, this.Trajectory_] = varargin{:};
+            end
+
             switch this.Mode
-                case 1
-                    [initialState, this.Trajectory_] = this.Trajectory.GenerateStable();
+                case this.ModeStable
                     this.Reward.Function = @(action, state, trajectory, observation) this.Reward.CalculateStable(action, state, trajectory, observation);
-                case 2
-                    [initialState, this.Trajectory_] = this.Trajectory.GenerateUnstable();
+                case this.ModeUnstable
                     this.Reward.Function = @(action, state, trajectory, observation) this.Reward.CalculateUnstable(action, state, trajectory, observation);
                     this.HasAlreadyEnteredUnstableRegion = false; % needed for episode termination check
                 otherwise
@@ -294,6 +312,10 @@ classdef Environment < rl.env.MATLABEnvironment
             this.Action_ = 0;
             this.State_ = initialState;
             initialObservation = this.GetObservation(this.Trajectory_(:,1));
+        end
+
+        function state = get.State(this)
+            state = this.State_;
         end
     end
 
