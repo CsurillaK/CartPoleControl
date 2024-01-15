@@ -119,7 +119,7 @@ plot(time, massPositions, "Color", "black", "LineWidth", 1.5);
 hold on
 plot(time, padArray(trajectory(1,:), sampleCount), "Color", "blue", "LineWidth", 1.5, "LineStyle", "--");
 xlabel("Time [s]", "Interpreter", "latex");
-ylabel({"Horizontal mass", "position [m]"}, "Interpreter", "latex");
+ylabel({"Horizontal end-", "point position [m]"}, "Interpreter", "latex");
 legend({"Actual", "Reference"}, "Interpreter", "latex");
 grid on
 set(gca, "FontSize", 14);
@@ -144,30 +144,40 @@ sampleCount = 160;
 time = (0:sampleCount-1) * environment.Physics.Ts;
 trajectory = environment.Trajectory.GenerateTrajectory(0, 3, 4);
 
-figure("Position", [596 386 1188 488]);
-axes();
+figure("Position", [596 141 1188 733]);
+axes1 = subplot(2, 1, 1);
 hold on;
+grid on
+axes2 = subplot(2, 1, 2);
+hold on;
+grid on
 
 physics = environment.Physics;
 for i = 1:20
     environment.Physics = perturbPhysics(physics, 0.6);
     initialObservation = [0;0;(rand(1)-0.5)*2;0];
-    [~, massPositions, ~] = simulateEnvironment(environment, stableAgent, initialObservation, trajectory, sampleCount);
-    perturbedLine = plot(time, massPositions, "Color", "black");
+    [angles, massPositions, ~] = simulateEnvironment(environment, stableAgent, initialObservation, trajectory, sampleCount);
+    perturbedLine1 = plot(axes1, time, massPositions, "Color", "black");
+    perturbedLine2 = plot(axes2, time, unwrap2(angles)/pi*180, "Color", "black");
 end
 environment.Physics = physics;
 
 initialObservation = [0;0;0;0];
-[~, massPositions, ~] = simulateEnvironment(environment, stableAgent, initialObservation, trajectory, sampleCount);
+[angles, massPositions, ~] = simulateEnvironment(environment, stableAgent, initialObservation, trajectory, sampleCount);
 
-nominalLine = plot(time, massPositions, "Color", "red", "LineWidth", 2);
-referenceLine = plot(time, padArray(trajectory(1,:), sampleCount), "Color", "blue", "LineWidth", 2, "LineStyle", "--");
+nominalLine1 = plot(axes1, time, massPositions, "Color", "red", "LineWidth", 2);
+nominalLine2 = plot(axes2, time, unwrap2(angles)/pi*180, "Color", "red", "LineWidth", 2);
+referenceLine = plot(axes1, time, padArray(trajectory(1,:), sampleCount), "Color", "blue", "LineWidth", 2, "LineStyle", "--");
 
-xlabel("Time [s]", "Interpreter", "latex");
-ylabel("Horizontal mass position [m]", "Interpreter", "latex");
-legend([referenceLine, nominalLine, perturbedLine], {"Reference", "Nominal", "Perturbed"}, "Interpreter", "latex", "Location", "best");
-grid on
-set(gca, "FontSize", 14);
+xlabel(axes1, "Time [s]", "Interpreter", "latex");
+ylabel(axes1, "Horizontal endpoint position [m]", "Interpreter", "latex");
+legend([referenceLine, nominalLine1, perturbedLine1], {"Reference", "Nominal", "Perturbed"}, "Interpreter", "latex", "Location", "best");
+set(axes1, "FontSize", 14);
+
+xlabel(axes2, "Time [s]", "Interpreter", "latex");
+ylabel(axes2, "Angle [$^{\circ}$]", "Interpreter", "latex");
+legend(axes2, [nominalLine2, perturbedLine2], {"Nominal", "Perturbed"}, "Interpreter", "latex");
+set(axes2, "FontSize", 14);
 
 %%
 environment.Mode = environment.ModeStable;
@@ -215,7 +225,7 @@ grid on
 
 physics = environment.Physics;
 for i = 1:20
-    environment.Physics = perturbPhysics(physics, 0.4);
+    environment.Physics = perturbPhysics(physics, 0.3);
     initialObservation = [0;0;pi+(rand(1)-0.5)*1;0];
     [angles, massPositions, ~] = simulateEnvironment(environment, unstableAgent, initialObservation, trajectory, sampleCount);
     perturbedLine1 = plot(axes1, time, massPositions, "Color", "black");
@@ -231,7 +241,7 @@ nominalLine2 = plot(axes2, time, unwrap2(angles)/pi*180+180, "Color", "red", "Li
 referenceLine = plot(axes1, time, padArray(trajectory(1,:), sampleCount), "Color", "blue", "LineWidth", 2, "LineStyle", "--");
 
 xlabel(axes1, "Time [s]", "Interpreter", "latex");
-ylabel(axes1, "Horizontal mass position [m]", "Interpreter", "latex");
+ylabel(axes1, "Horizontal endpoint position [m]", "Interpreter", "latex");
 legend([referenceLine, nominalLine1, perturbedLine1], {"Reference", "Nominal", "Perturbed"}, "Interpreter", "latex", "Location", "best");
 set(axes1, "FontSize", 14);
 
@@ -251,7 +261,7 @@ hold on;
 
 physics = environment.Physics;
 for i = 1:30
-    environment.Physics = perturbPhysics(physics, 0.4);
+    environment.Physics = perturbPhysics(physics, 0.3);
     initialObservation = [0;0;(rand(1)-0.5)*2;0];
     [angles, ~, ~] = simulateEnvironment(environment, unstableAgent, initialObservation, [0;0], sampleCount);
     perturbedLine = plot(time, 180 + unwrap2(angles)/pi*180, "Color", "black");

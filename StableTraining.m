@@ -28,7 +28,7 @@ stableAgent.AgentOptions.NoiseOptions.StandardDeviation = 0.05; % 0.4
 stableAgent.AgentOptions.NoiseOptions.StandardDeviationMin = 0.05;
 stableAgent.AgentOptions.NoiseOptions.StandardDeviationDecayRate = 0.00005;
 
-% noiseModel = rl.option.OrnsteinUhlenbeckActionNoise();
+% stableAgent.AgentOptions.NoiseOptions = rl.option.OrnsteinUhlenbeckActionNoise();
 % stableAgent.AgentOptions.NoiseOptions.SampleTime = 0.05;
 % stableAgent.AgentOptions.NoiseOptions.StandardDeviation = 0.01; % 0.3
 % stableAgent.AgentOptions.NoiseOptions.StandardDeviationDecayRate = 0.0001;
