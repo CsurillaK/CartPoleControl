@@ -1,5 +1,5 @@
 # CartPoleControl
-Cart pole trajectory control and balancing, reinforcement learning training environment and visualization in Matlab.
+Cart pole trajectory control and balancing, reinforcement learning training environment and visualization in Matlab. Included agents have been trained with DDPG (Deep Determinsitic Policy Gradient) method.  
 
 ![](Misc/Swingup.gif)
 
